@@ -1,0 +1,111 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-07-21 09:56:31
+ * @LastEditTime: 2021-09-14 11:16:39
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \fe-component-lib\src\components\xForm\xFormHeader.vue
+-->
+<!--  -->
+<template>
+  <div
+    v-if="footConfig && footConfig.show"
+    class="fix_foot"
+    :class="[{ backgroundNone: footConfig.backgroundNone }, footConfig.class]"
+  >
+    <el-row>
+      <el-col
+        v-for="(item, key) in footConfig.list"
+        :key="key"
+        :span="item.span || 8"
+        :offset="item.offset || 0"
+        :push="item.push || 0"
+        :pull="item.pull || 0"
+      >
+        <el-row
+          v-if="computeBoolen(item.show)"
+          type="flex"
+          :justify="item.justify || 'left'"
+        >
+          <el-col :style="{ textAlign: item.justify }">
+            <template v-for="(tool, tKey) in item.list">
+              <component
+                v-if="computeBoolen(tool.show)"
+                :key="tKey"
+                :is="getComponentType(tool)"
+                v-model="formData[tool.model]"
+                :propData="formData[tool.model]"
+                :config="tool"
+                @watchCallBackFunItem="watchCallBackFun"
+              >
+              </component>
+              <!-- <el-button
+                v-if="tool.type == 'button' && tool.show"
+                :key="tKey"
+                :plain="tool.plain"
+                :round="tool.round"
+                :circle="tool.circle"
+                :icon="tool.icon"
+                size="small"
+                :type="tool.styleType"
+                @click="submitForm(tool.clickName, tool.rule)"
+                >{{ tool.label }}</el-button
+              > -->
+            </template>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+import MyButton from "../../../xButton/src/xButton.vue";
+import mixinComponent from "../../../utils/xElementJs/xMixin.js";
+import { getComponentType } from "../../../utils/xElementJs/defaultFunction";
+
+export default {
+  //import引入的组件需要注入到对象中才能使用
+  mixins: [mixinComponent()],
+  props: {
+    footConfig: {
+      type: Object,
+      default: Object
+    }
+  },
+  components: { MyButton },
+  data() {
+    //这里存放数据
+    return {
+      formData: {}
+    };
+  },
+  //监听属性 类似于data概念
+  computed: {},
+  //监控data中的数据变化
+  watch: {},
+  //方法集合
+  methods: {
+    // 获取动态组件类型
+    getComponentType: getComponentType,
+    // 数据回调
+    watchCallBackFun(obj) {
+      this.$emit("watchCallBackFun", { ...obj, list: this.formData });
+      // console.log("数据回调", { ...obj, list: this.formData });
+    }
+  },
+  //生命周期 - 创建完成（可以访问当前this实例）
+  created() {},
+  //生命周期 - 挂载完成（可以访问DOM元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+};
+</script>
